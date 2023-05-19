@@ -1,0 +1,48 @@
+name: New Cluster
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    branches: [ main ]
+
+env:
+  AWS_REGION: eu-west-2                   # set this to your preferred AWS region, e.g. us-west-1
+  ECR_REPOSITORY: ew-nlp/development           # set this to your Amazon ECR repository name
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    permissions:
+        id-token: write
+        contents: read
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::475755457693:role/github-actions-wcc
+          role-session-name: github-actions-wcc
+          aws-region: ${{ env.AWS_REGION }}v
+      - name: Install Kubectl
+        run: |
+            curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.23.6/bin/linux/amd64/kubectl \
+            --location \
+            --remote-name
+            chmod +x kubectl
+            sudo mv kubectl /usr/local/bin/
+      - name: Write Kubeconfig
+        env:
+            KUBE_CONFIG: ${{ secrets.EKS_KUBE_CONFIG }}
+        run: |
+            echo $KUBE_CONFIG | base64 --decode > kubeconfig.yaml
+            echo $KUBE_CONFIG
+      
+      - name: Update Deployment with just built image
+        run: |
+         export KUBECONFIG=kubeconfig.yaml
+         kubectl apply -f kubernetes/complete-demo.yaml
