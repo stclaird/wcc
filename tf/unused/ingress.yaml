@@ -1,0 +1,23 @@
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: socks-ingress
+#   namespace: sock-shop
+#   annotations:
+#     kubernetes.io/ingress.class: alb
+#     alb.ingress.kubernetes.io/scheme: internet-facing
+#     alb.ingress.kubernetes.io/subnets: subnet-0ecf961127f15b00b,subnet-0cc3a7c6a529fb1e4,subnet-025b6b370fe31e274
+#     alb.ingress.kubernetes.io/healthcheck-path: /v1/client/health
+#     alb.ingress.kubernetes.io/group.name: wcc-sockshop-lb
+# spec:
+#   rules:
+#     - host: 
+#       http:
+#         paths:
+#           - backend:
+#               service:
+#                 name: front-end
+#                 port: 
+#                   number: 80
+#             path: /
+#             pathType: Prefix

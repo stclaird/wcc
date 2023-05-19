@@ -1,0 +1,13 @@
+prometheus:
+  prometheusSpec:
+    additionalScrapeConfigs:
+      - job_name: ingress
+        honor_timestamps: true
+        scrape_interval: 1m
+        scrape_timeout: 1m
+        metrics_path: /metrics
+        scheme: http
+        static_configs:
+        - targets:
+          - nginx-prom-metrics.ingress-nginx.svc.cluster.local:9901
+

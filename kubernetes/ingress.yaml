@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: socks-shop-ingress
+  namespace: sock-shop
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - socks-shop.davidstclair.co.uk
+    secretName: sock-shop-tls-secret
+  rules:
+  - host: socks-shop.davidstclair.co.uk
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: front-end
+            port:
+              number: 80
