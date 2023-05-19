@@ -28,21 +28,29 @@ jobs:
           role-to-assume: arn:aws:iam::475755457693:role/github-actions-wcc
           role-session-name: github-actions-wcc
           aws-region: ${{ env.AWS_REGION }}
-      - name: Install Kubectl
-        run: |
-            curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.23.6/bin/linux/amd64/kubectl \
-            --location \
-            --remote-name
-            chmod +x kubectl
-            sudo mv kubectl /usr/local/bin/
-      - name: Write Kubeconfig
-        env:
-            KUBE_CONFIG: ${{ secrets.EKS_KUBE_CONFIG }}
-        run: |
-            echo $KUBE_CONFIG | base64 --decode > kubeconfig.yaml
-            echo $KUBE_CONFIG
+      # - name: Install Kubectl
+      #   run: |
+      #       curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.23.6/bin/linux/amd64/kubectl \
+      #       --location \
+      #       --remote-name
+      #       chmod +x kubectl
+      #       sudo mv kubectl /usr/local/bin/
+      # - name: Install AWS CLI
+      #   run: |
+      #       curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && sudo ./aws/install --update
       
-      - name: Update Deployment with just built image
-        run: |
-         export KUBECONFIG=kubeconfig.yaml
-         kubectl apply -f kubernetes/complete-demo.yaml
+      # - name: Write Kubeconfig
+      #   env:
+      #       KUBE_CONFIG: ${{ secrets.EKS_KUBE_CONFIG }}
+      #   run: |
+      #       echo $KUBE_CONFIG | base64 --decode > kubeconfig.yaml
+      #       echo $KUBE_CONFIG
+      - name: Build and push CONTAINER_NAME
+        uses: ianbelcher/eks-kubectl-action@master
+        with:
+          cluster_name: wcc-tf
+          args: apply -f kubernetes/complete-demo.yaml
+      # - name: Update Deployment with just built image
+      #   run: |
+      #    export KUBECONFIG=kubeconfig.yaml
+      #    kubectl apply -f kubernetes/complete-demo.yaml
